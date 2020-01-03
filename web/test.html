@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script src="static/depend/vue/vue.js"></script>
+    <script src="static/depend/reqwest/reqwest.js"></script>
+</head>
+<body>
+<div id="app">
+    {{id}}
+    {{data}}
+    <input type="text" >
+    <button @click="test">click</button>
+    <button @click="test2">test2</button>
+</div>
+
+<script>
+    let vm = new Vue({
+        el: '#app',
+        data: {
+            id: 'hahah',
+            password: "sj111111",
+            data: {}
+        },
+        methods: {
+            test: function() {
+                let self = this;
+                alert("进到test函数里了");
+                reqwest({
+                    url: 'http://localhost:8080/SPMS/TestServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        alert("err!")
+                    }
+                    , success: function (data) {
+                        alert("success");
+                        console.log(data);
+                        self.data = data;
+                    }
+                })
+            },
+
+            test2: function () {
+                let self = this;
+                alert("进到test2函数里了");
+                reqwest({
+                    url: 'http://localhost:8080/SPMS/TestServlet'
+                    , method: 'post'
+                    , data: {
+                        id: self.id,
+                        password: self.password
+                    }
+                    , error: function (err) {
+                        alert("err!")
+                    }
+                    , success: function (data) {
+                        alert("success");
+                        console.log(data);
+                        self.data = data;
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

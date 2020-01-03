@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <script src="static/depend/vue/vue.js"></script>
+    <script src="static/depend/reqwest/reqwest.js"></script>
+</head>
+<body>
+<div id="app">
+{{data}}
+</div>
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data: {
+            data: {}
+        },
+        methods: {
+            getData: function () {
+                let self = this;
+                reqwest({
+                    url: 'http://localhost:8080/SPMS/UserInfoServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        alert("err!")
+                    }
+                    , success: function (data) {
+                        alert("success");
+                        console.log(data);
+                        self.data = data;
+                    }
+                })
+            }
+        },
+        mounted(){
+            this.getData()
+        }
+    })
+</script>
+</body>
+</html>

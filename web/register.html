@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>用户注册</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="static/login/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="static/login/css/util.css">
+    <link rel="stylesheet" type="text/css" href="static/login/css/main.css">
+    <link rel="stylesheet" type="text/css" href="static/depend/bootstrap/min.css">
+    <script src="static/depend/vue/vue.js"></script>
+    <script src="static/depend/reqwest/reqwest.js"></script>
+    <script src="static/depend/bootstrap/min.js"></script>
+</head>
+<body>
+<div id="app">
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <div class="login100-form-title" style="background-image: url(static/login/image/bg-01.jpg);">
+                    <span class="login100-form-title-1" v-if="type==='0'">教师注册</span>
+                    <span class="login100-form-title-1" v-else>学生注册</span>
+                </div>
+                <!--                method="post" action="http://localhost:8080/SPMS/loginServlet"-->
+                <form class="login100-form validate-form" >
+                    <div class="wrap-input100 validate-input m-b-26" data-validate="职工号不能为空" v-if="type==='0'">
+                        <span class="label-input100">职工号</span>
+                        <input class="input100" type="text" name="id" placeholder="请输入教师职工号" v-model="id">
+                        <span class="focus-input100"></span>
+                    </div>
+                    <div class="wrap-input100 validate-input m-b-26" data-validate="学号不能为空" v-else>
+                        <span class="label-input100">账号</span>
+                        <input class="input100" type="text" name="id" placeholder="请输入学号" v-model="id">
+                        <span class="focus-input100"></span>
+                    </div>
+                    <div class="wrap-input100 validate-input m-b-26" data-validate="姓名不能为空">
+                        <span class="label-input100">姓名</span>
+                        <input class="input100" type="text" name="name" placeholder="请输入姓名" v-model="name">
+                        <span class="focus-input100"></span>
+                    </div>
+
+                    <div class="wrap-input100 validate-input m-b-18" data-validate="密码不能为空">
+                        <span class="label-input100">密码</span>
+                        <input class="input100" type="password" name="password" v-model="password">
+                        <span class="focus-input100"></span>
+                    </div>
+
+                    <div class="wrap-input100 validate-input m-b-18" data-validate="密码不能为空">
+                        <span class="label-input100">密码</span>
+                        <input class="input100" type="password" name="passAgain" v-model="passAgain">
+                        <span class="focus-input100"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6" @click="type='0'">
+                            <span class="glyphicon glyphicon-briefcase" aria-hidden="true">教师登录</span>
+                        </div>
+                        <div class="col-md-6" @click="type='1'">
+                            <span class="glyphicon glyphicon-education" aria-hidden="true">学生登录</span>
+                        </div>
+                    </div>
+                    <div>
+
+                    </div>
+<!--                    <div class="flex-sb-m w-full p-b-30">-->
+<!--                        <div class="contact100-form-checkbox">-->
+<!--                            <input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">-->
+<!--                            <label class="label-checkbox100" for="ckb1">记住我</label>-->
+<!--                        </div>-->
+
+<!--                        <div>-->
+<!--                            <a href="javascript:" class="txt1">忘记密码？</a>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="container-login100-form-btn" @click="register">
+                        <button class="login100-form-btn">注 册</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data: {
+            type: "",
+            id: "",
+            password: "",
+            passAgain: "",
+            name: "",
+            data: {}
+        },
+        methods: {
+
+            register: function () {
+                let self = this;
+                alert("进到login函数里了");
+                reqwest({
+                    url: 'http://localhost:8080/SPMS/RegisterServlet'
+                    , method: 'post'
+                    , data: {
+                        id: self.id,
+                        password: self.password,
+                        passAgain: self.passAgain,
+                        name: self.name,
+                        type: self.type
+                    }
+                    , error: function (err) {
+                        alert("用户名或密码错误");
+                        window.location.href = "http://localhost:8080/SPMS/register.html";
+                    }
+                    , success: function (data) {
+                        alert("登录成功");
+                        self.data = data;
+                        window.location.href = "http://localhost:8080/SPMS/index.html";
+                    }
+                })
+            }
+        }
+    })
+</script>
+<script src="static/depend/js/jquery-3.2.1.min.js"></script>
+<script src="static/login/js/main.js"></script>
+</body>
+
+</html>
