@@ -31,6 +31,9 @@ public class CheckParametersUtil {
     }
 
     public static boolean checkTel(String tel) {
+        if(!checkStringLen(tel, 11, 11)){
+            return false;
+        }
         String regExp = "^(1)\\d{10}$";
         Pattern p = Pattern.compile(regExp);
         Matcher m = p.matcher(tel);

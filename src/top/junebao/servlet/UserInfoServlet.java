@@ -71,7 +71,7 @@ public class UserInfoServlet extends HttpServlet {
         SetType.set(req, resp);
         String fromDataString = JSONUtil.toFormDataString(req);
         Map<String, Object> map = JSONUtil.fromDataToMap(fromDataString);
-        // 1. 确保学生已经登录，如果登录，拿到session中保存的User.id
+        // 1. 确保用户已经登录，如果登录，拿到session中保存的User.id
         boolean auth = Auth.auth(req, resp);
         if(!auth){
             JsonResponse.jsonResponse(resp, 401, "您还没登录");
@@ -99,6 +99,7 @@ public class UserInfoServlet extends HttpServlet {
                                 JsonResponse.jsonResponse(resp, 400, "新值不合法！");
                             } else {
                                 // 5. 调用StudentDao中的updateStudentInfoById方法更新学生数据
+                                // 使用反射动态调用教师或学生Dao中的这个方法
                                 Method method = playDaoClass.getMethod("update" + playStr + "InfoById",
                                         String.class, String.class, String.class);
                                 Object invoke = method.invoke(playDaoClass.newInstance(), id, key, newValue);
