@@ -1,12 +1,15 @@
 package top.junebao.domain;
 
 public class Student extends User {
-    public String getStudent_class() {
-        return student_class;
+    public String studentClass;
+    public String magor;
+
+    public String getStudentClass() {
+        return studentClass;
     }
 
-    public void setStudent_class(String student_class) {
-        this.student_class = student_class;
+    public void setStudentClass(String studentClass) {
+        this.studentClass = studentClass;
     }
 
     public String getMagor() {
@@ -21,8 +24,7 @@ public class Student extends User {
 
     }
 
-    public String student_class;
-    public String magor;
+
 
     public Student(){}
 
@@ -30,10 +32,10 @@ public class Student extends User {
         super(id, password);
     }
 
-    public Student(String id, String name, String sex, String student_class,
+    public Student(String id, String name, String sex, String studentClass,
                    String magor, String tel, String place, String password) {
         super(id, name,sex,tel, place, password);
-        this.student_class = student_class;
+        this.studentClass = studentClass;
         this.magor = magor;
     }
 
