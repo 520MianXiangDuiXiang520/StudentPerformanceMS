@@ -13,12 +13,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
 @WebServlet("/UserInfoServlet")
 public class UserInfoServlet extends HttpServlet {
+    private String id;
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         SetType.set(request, response);
 
@@ -30,9 +34,27 @@ public class UserInfoServlet extends HttpServlet {
         if(!auth){
             JsonResponse.jsonResponse(response, 401, "您还没登录");
         } else{
-            // 如果用户已经登录，用户的信息就会被携带在request中，教师登录就会携带教师信息
-            // 学生登录就会携带学生信息，所以教师查询个人信息和学生查询个人信息可以直接转发到这而不用区分
-            JsonResponse.jsonResponse(response, request.getAttribute("user"));
+            Object play = request.getAttribute("play");
+            if("Student".equals(play.toString()) || "Teacher".equals(play.toString())){
+                User user = (User) request.getAttribute("user");
+                id = user.id;
+                Object objUser = null;
+                try {
+                    Class<?> aClass = Class.forName("top.junebao.dao."+play.toString() + "Dao");
+                    Method method = aClass.getMethod("get" + play.toString() + "InfoById", String.class);
+                    objUser = method.invoke(aClass.newInstance(), id);
+                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+
+                if(objUser == null) {
+                    JsonResponse.jsonResponse(response, 400, "用户不存在！");
+                }else{
+                    JsonResponse.jsonResponse(response, objUser);
+                }
+            } else {
+                JsonResponse.jsonResponse(response, 403, "该接口不向用户开放");
+            }
         }
     }
 
@@ -45,14 +67,58 @@ public class UserInfoServlet extends HttpServlet {
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 修改学生信息
         SetType.set(req, resp);
-        // 1. 检查参数，需要的参数有：（1.）要修改的信息名key （2.）新的值newValue
         String fromDataString = JSONUtil.toFormDataString(req);
         Map<String, Object> map = JSONUtil.fromDataToMap(fromDataString);
-        if(!CheckParametersUtil.checkRequestParam(map, new ArrayList<>(Arrays.asList("key", "newValue")))){
-            JsonResponse.jsonResponse(resp, 400, "参数错误！");
-        }else{
-            // 说明有key和newValue,先检查key是不是用户的属性
+        // 1. 确保学生已经登录，如果登录，拿到session中保存的User.id
+        boolean auth = Auth.auth(req, resp);
+        if(!auth){
+            JsonResponse.jsonResponse(resp, 401, "您还没登录");
+        } else {
+            Object play = req.getAttribute("play");
+            if("Student".equals(play.toString()) || "Teacher".equals(play.toString())){
+                User user = (User) req.getAttribute("user");
+                id = user.id;
+                String playStr = play.toString();
+                try {
+                    Class playClass = Class.forName("top.junebao.domain." + playStr);
+                    Class<?> playDaoClass = Class.forName("top.junebao.dao." + playStr + "Dao");
+                    // 2. 确保req中包含key, newValue字段
+                    if(!CheckParametersUtil.checkRequestParam(map, new ArrayList<>(Arrays.asList("key", "newValue")))){
+                        JsonResponse.jsonResponse(resp, 400, "参数缺失");
+                    } else {
+                        String key = (String) map.get("key");
+                        String newValue = (String) map.get("newValue");
+                        // 3. 确保key是student表中的字段
+                        if (!CheckParametersUtil.checkFieldIsInClass(playClass, key)){
+                            JsonResponse.jsonResponse(resp, 400, "参数错误！");
+                        } else {
+                            // 4. 确保newValue字段合法（反射！！）
+                            if(!CheckParametersUtil.checkValueByKey(key, newValue)) {
+                                JsonResponse.jsonResponse(resp, 400, "新值不合法！");
+                            } else {
+                                // 5. 调用StudentDao中的updateStudentInfoById方法更新学生数据
+                                Method method = playDaoClass.getMethod("update" + playStr + "InfoById",
+                                        String.class, String.class, String.class);
+                                Object invoke = method.invoke(playDaoClass.newInstance(), id, key, newValue);
+//                                Student student = StudentDao.updateStudentInfoById(id, key, newValue);
+                                if(invoke == null) {
+                                    JsonResponse.jsonResponse(resp, 400, "修改失败！！");
+                                } else {
+                                    // 6. 将更新后的Student()对象返回
+                                    JsonResponse.jsonResponse(resp, invoke);
+                                }
+                            }
+                        }
+                    }
+                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                JsonResponse.jsonResponse(resp, 403, "该接口不向用户开放");
+            }
+
         }
     }
 }
