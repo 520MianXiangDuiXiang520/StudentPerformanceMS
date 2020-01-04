@@ -64,9 +64,8 @@
 
             login: function () {
                 let self = this;
-                alert("进到login函数里了");
                 reqwest({
-                    url: 'http://localhost:8080/SPMS/loginServlet'
+                    url: 'http://localhost:8080/SPMS/StudentLoginServlet'
                     , method: 'post'
                     , data: {
                         id: self.id,
@@ -74,7 +73,7 @@
                     }
                     , error: function (err) {
                         alert("用户名或密码错误");
-                        window.location.href = "http://localhost:8080/SPMS/login.html";
+                        // window.location.href = "http://localhost:8080/SPMS/login.html";
                     }
                     , success: function (data) {
                         alert("登录成功");
