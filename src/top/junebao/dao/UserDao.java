@@ -14,9 +14,9 @@ public class UserDao {
      * @param password 密码
      * @return 账号密码匹配返回true，否则返回false
      */
-    private User login(String id, String password) {
+    private User login(String id, String password, String table) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "SELECT * FROM student WHERE id=? AND password=?";
+        String sql = "SELECT * FROM "+ table +" WHERE id=? AND password=?";
         List<User> query = jdbcTemplate.query(sql, new BeanPropertyRowMapper<User>(User.class), id, password);
         if(query.size() <= 0)
             return null;
@@ -29,9 +29,9 @@ public class UserDao {
      * @param user User对象，必须包含id和password两个字段，反则认为不存在
      * @return Boolean
      */
-    public User login(User user) {
+    public User login(User user, String table) {
         if(user.id != null && user.password != null) {
-            return login(user.id, user.password);
+            return login(user.id, user.password, table);
         } else {
             return null;
         }

@@ -34,12 +34,19 @@ public class LoginServlet extends HttpServlet {
         String params = JSONUtil.toFormDataString(req);
         System.out.println(params);
         User loginUser = (User) JSONUtil.formDataToObject(params, User.class);
-
+        Object play = req.getAttribute("play");
+        if("student".equals(play.toString()) || "teacher".equals(play.toString())){
+            userDao = new UserDao();
+            User user = userDao.login(loginUser, play.toString());
+            toLogin(req, resp, user);
+        }
         System.out.println(loginUser);
-        userDao = new UserDao();
-        User user = userDao.login(loginUser);
+
+    }
+
+    public static void toLogin(HttpServletRequest req, HttpServletResponse resp, User user) throws IOException {
         if(user != null){
-            Map<String, Object>  result = new HashMap<>();
+            Map<String, Object> result = new HashMap<>();
             result.put("code", "200");
             result.put("data", user);
             // 登陆成功，设置session
