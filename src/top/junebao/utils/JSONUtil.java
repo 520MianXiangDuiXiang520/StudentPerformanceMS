@@ -50,6 +50,7 @@ public class JSONUtil {
      * @throws JsonProcessingException
      */
     public static Map<String, Object> fromDataToMap(String string) {
+        string = URLDecode.getURLDecoderString(string);
         Map<String, Object> map = new HashMap<>();
         String[] splits = string.split("&");
         for (String sp:splits
