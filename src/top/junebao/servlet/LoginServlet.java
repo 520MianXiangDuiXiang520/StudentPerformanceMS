@@ -3,6 +3,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import top.junebao.dao.UserDao;
 import top.junebao.domain.User;
 import top.junebao.utils.JSONUtil;
+import top.junebao.utils.JsonResponse;
 import top.junebao.utils.SetType;
 
 import javax.servlet.ServletException;
@@ -39,27 +40,25 @@ public class LoginServlet extends HttpServlet {
             userDao = new UserDao();
             User user = userDao.login(loginUser, play.toString());
             toLogin(req, resp, user);
+        } else {
+            JsonResponse.jsonResponse(resp, 403, "该接口不向用户开放");
         }
-        System.out.println(loginUser);
+
 
     }
 
     public static void toLogin(HttpServletRequest req, HttpServletResponse resp, User user) throws IOException {
         if(user != null){
             Map<String, Object> result = new HashMap<>();
-            result.put("code", "200");
-            result.put("data", user);
             // 登陆成功，设置session
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            String jsonResp = JSONUtil.toJSON(result);
             System.out.println("==========success==========");
-            resp.getWriter().write(jsonResp);
+            JsonResponse.jsonResponse(resp, 200, user, "ok");
         } else {
-            Map<String, Object>  fileResult = new HashMap<>();
-            fileResult.put("code", "401");
-            fileResult.put("msg", "用户名或密码错误！");
-            resp.getWriter().write(JSONUtil.toJSON(fileResult));
+            System.out.println("=================用户名或密码错误=================");
+            JsonResponse.jsonResponse(resp, 401, "用户名或密码错误");
+
         }
     }
 }

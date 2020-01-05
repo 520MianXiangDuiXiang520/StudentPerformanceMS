@@ -1,6 +1,7 @@
 package top.junebao.test;
 
 import org.junit.jupiter.api.Test;
+import top.junebao.domain.Student;
 import top.junebao.domain.Teacher;
 import top.junebao.utils.CheckParametersUtil;
 
@@ -19,7 +20,7 @@ public class TestCheck {
 
     @Test
     public void testCheckFieldIsInClass() {
-        boolean dept = CheckParametersUtil.checkFieldIsInClass(Teacher.class, "dept");
+        boolean dept = CheckParametersUtil.checkFieldIsInClass(Student.class, "tel");
         System.out.println(dept);
     }
 
