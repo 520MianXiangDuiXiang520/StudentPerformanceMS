@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>test</title>
-    <script src="static/depend/vue/vue.js"></script>
-    <script src="static/depend/reqwest/reqwest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.bootcss.com/reqwest/2.0.5/reqwest.js"></script>
 </head>
 <body>
 <div id="app">
@@ -19,8 +19,8 @@
     let vm = new Vue({
         el: '#app',
         data: {
-            id: 'hahah',
-            password: "sj111111",
+            id: 'XY-N1',
+            password: "swk11111",
             data: {}
         },
         methods: {
@@ -45,7 +45,7 @@
                 let self = this;
                 alert("进到test2函数里了");
                 reqwest({
-                    url: 'http://localhost:8080/SPMS/TestServlet'
+                    url: 'http://localhost:8080/SPMS/StudentLoginServlet'
                     , method: 'post'
                     , data: {
                         id: self.id,
@@ -55,9 +55,14 @@
                         alert("err!")
                     }
                     , success: function (data) {
-                        alert("success");
-                        console.log(data);
-                        self.data = data;
+                        if(data['code'] === 200) {
+                            alert("success");
+                            alert(data['data']);
+                            console.log(data);
+                            self.data = data;
+                        } else {
+                            alert(data['msg'])
+                        }
                     }
                 })
             }

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.bootcss.com/reqwest/2.0.5/reqwest.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="http://demo.cssmoban.com/cssthemes6/foun_7_Polaris/assets/css/plugins.css">
+    <link rel="stylesheet" href="http://demo.cssmoban.com/cssthemes6/foun_7_Polaris/assets/css/main.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/diquick@1.4.21/diquick.css">
+    <script src="https://unpkg.com/diquick@1.4.21/diquick.js"></script>
+</head>
+<body>
+<div id="app">
+    <!--    固定在最上面的导航栏-->
+    <nav class="navigation-main" style="top: 0px">
+        <div class="container-fluid" style="margin-left: 0;margin-right: 0">
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="navigation-items nav navbar-nav navbar-right" v-if="data.id">
+                    <li v-bind:class="{ current: class1 }"><a href="StudentIndex.html">首页</a></li>
+                    <li v-bind:class="{ current: class2 }" @click="innerUserCenter"><a href="javaScript:;">个人中心</a></li>
+                    <li v-bind:class="{ current: class3 }"><a href="#service">课程管理</a></li>
+                    <li v-bind:class="{ current: class4 }"><a href="#work">成绩管理</a></li>
+                    <li v-bind:class="{ current: class5 }"><a href="#clients">关于</a></li>
+                    <li v-bind:class="{ current: class6 }"><a href="#contact">开源</a></li>
+                </ul>
+                <ul class="navigation-items nav navbar-nav navbar-right" style="margin-right: 250px" v-else>
+                    <li v-bind:class="{ current: class1 }">
+                        <a href="http://localhost:8080/SPMS/login.html">登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+<!--    侧边栏-->
+    <div id="main">
+
+    </div>
+</div>
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data: {
+            data: {},
+            class1: true,
+            class2: false,
+            class3: false,
+            class4: false,
+            class5: false,
+            class6: false
+        },
+        methods: {
+            getData: function () {
+                let self = this;
+                reqwest({
+                    url: 'http://localhost:8080/SPMS/TeacherInfoServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        // alert("success");
+                        console.log(data);
+                        self.data = data['data'];
+                    }
+                })
+            },
+
+            innerUserCenter: function() {
+                /**
+                 * 加载个人中心页面
+                 */
+                this.class1 = false;
+                this.class2 = true;
+                this.class3 = false;
+                this.class4 = false;
+                this.class5 = false;
+                this.class6 = false;
+                let main = document.getElementById('main');
+                main.innerHTML = ("<iframe frameborder = 0 width = 100% height=800 marginheight = 0 marginwidth = 0 scrolling = no" +
+                    " src = 'TeacherCenter.html' ></iframe >")
+            }
+        },
+        mounted(){
+            this.getData()
+        }
+    })
+</script>
+
+</body>
+</html>

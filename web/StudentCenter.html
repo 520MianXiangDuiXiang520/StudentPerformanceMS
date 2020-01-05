@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.bootcss.com/reqwest/2.0.5/reqwest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/diquick@1.4.21/diquick.css">
+    <script src="https://unpkg.com/diquick@1.4.21/diquick.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+<div id="app" >
+    <div id="left">
+        <div id="toggle">
+            <div class="leftBork">
+                <img id="headImage" src="static/login/image/bg-01.jpg" class="circle border">
+            </div>
+        </div>
+        <div id="main">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">个人中心</div>
+                <div class="panel-body">
+                    <p>学生信息管理</p>
+                </div>
+
+                <!-- Table -->
+                <table class="table table-hover">
+                    <tr>
+                        <th>项 目</th>
+                        <th>内 容</th>
+                        <th>操 作</th>
+                    </tr>
+                    <tr v-for="(v, n) in data">
+                        <td class="active">{{n}}</td>
+                        <td class="success">
+                            <div class=".input-group">
+                                <input type="text" :placeholder="data[n]" v-model="v">
+                            </div>
+                        </td>
+                        <td class="warning" @click="changeInfo(n, v)">
+                            <button type="button" class="btn btn-info" >修改</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data: {
+            data: {},
+            play: 1,
+            id: "",
+            name: "",
+            sex: "",
+            tel: "",
+            place: "",
+            password: "",
+            studentClass: "",
+            magor: ""
+        },
+        methods: {
+            changeInfo: function(key, value) {
+                let self = this;
+                reqwest({
+                    url: 'http://localhost:8080/SPMS/StudentInfoServlet'
+                    , method: 'put'
+                    , data: {
+                        key: key,
+                        newValue: value
+                    }
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            self.data = data['data'];
+                            alert("修改成功")
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                })
+            },
+            getData: function () {
+                let self = this;
+                reqwest({
+                    url: 'http://localhost:8080/SPMS/StudentInfoServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            self.data = data['data'];
+                        } else {
+                            alert(data)
+                        }
+                        console.log(data);
+                    }
+                })
+            },
+        },
+        mounted(){
+            this.getData()
+        }
+    })
+</script>
+</body>
+</html>
