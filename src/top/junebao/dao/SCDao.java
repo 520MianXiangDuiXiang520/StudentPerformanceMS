@@ -39,10 +39,13 @@ public class SCDao {
      */
     public static List<Map<String, Object>> selectSCBySno(String Sno) throws JsonProcessingException {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "SELECT student.id AS studentId, student.name AS studentName," +
-                " course.id AS courseID, course.name AS courseName ,sc.score " +
-                "FROM student, sc, course WHERE student.id= ? " +
-                " AND student.id = sc.sno AND course.id=sc.cno;";
+        String sql = "SELECT student.id AS studentId, student.NAME AS studentName," +
+                " course.id AS courseID, course.NAME AS courseName, sc.score," +
+                " course.cscore, course.ctime, teacher.NAME AS teacherName" +
+                "  FROM student, sc, course, tc, teacher " +
+                "WHERE student.id = ? AND student.id = sc.sno " +
+                "AND course.id = sc.cno AND student.student_class = tc.classno" +
+                " AND course.id = tc.cno AND teacher.id = tc.tno;";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, Sno);
         if(rows.size() < 1)
             return null;

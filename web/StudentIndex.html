@@ -23,8 +23,12 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="navigation-items nav navbar-nav navbar-right" v-if="data.id">
                     <li v-bind:class="{ current: class1 }"><a href="StudentIndex.html">首页</a></li>
-                    <li v-bind:class="{ current: class2 }" @click="innerUserCenter"><a href="javaScript:;">个人中心</a></li>
-                    <li v-bind:class="{ current: class3 }"><a href="#service">课程管理</a></li>
+                    <li v-bind:class="{ current: class2 }" @click="innerUserCenter">
+                        <a href="javaScript:;">个人中心</a>
+                    </li>
+                    <li v-bind:class="{ current: class3 }" @click="innerStudentScore">
+                        <a href="javaScript:;">课程管理</a>
+                    </li>
                     <li v-bind:class="{ current: class4 }"><a href="#work">成绩管理</a></li>
                     <li v-bind:class="{ current: class5 }"><a href="#clients">关于</a></li>
                     <li v-bind:class="{ current: class6 }"><a href="#contact">开源</a></li>
@@ -83,6 +87,20 @@
                 let main = document.getElementById('main');
                 main.innerHTML = ("<iframe frameborder = 0 width = 100% height=800 marginheight = 0 marginwidth = 0 scrolling = no" +
                     " src = 'StudentCenter.html' ></iframe >")
+            },
+            innerStudentScore: function() {
+                /**
+                 * 加载学生成绩
+                 */
+                this.class1 = false;
+                this.class2 = false;
+                this.class3 = true;
+                this.class4 = false;
+                this.class5 = false;
+                this.class6 = false;
+                let main = document.getElementById('main');
+                main.innerHTML = ("<iframe frameborder = 0 width = 100% height=800 marginheight = 0 marginwidth = 0 scrolling = no" +
+                    " src = 'StudentScore.html' ></iframe >")
             }
         },
         mounted(){
