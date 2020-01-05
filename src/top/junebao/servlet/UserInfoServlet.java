@@ -89,27 +89,32 @@ public class UserInfoServlet extends HttpServlet {
                         JsonResponse.jsonResponse(resp, 400, "参数缺失");
                     } else {
                         String key = (String) map.get("key");
-                        String newValue = (String) map.get("newValue");
-                        // 3. 确保key是student表中的字段
-                        if (!CheckParametersUtil.checkFieldIsInClass(playClass, key)){
-                            JsonResponse.jsonResponse(resp, 400, "参数错误！");
+                        if("magor".equals(key) || "studentClass".equals(key) ||
+                                "id".equals(key) || "name".equals(key)){
+                            JsonResponse.jsonResponse(resp, 400, "不能修改该字段！");
                         } else {
-                            // 4. 确保newValue字段合法（反射！！）
-                            if(!CheckParametersUtil.checkValueByKey(key, newValue)) {
-                                JsonResponse.jsonResponse(resp, 400, "新值不合法！");
+                            String newValue = (String) map.get("newValue");
+                            // 3. 确保key是student表中的字段
+                            if (!CheckParametersUtil.checkFieldIsInClass(playClass, key)){
+                                JsonResponse.jsonResponse(resp, 400, "参数错误！");
                             } else {
-                                // 5. 调用StudentDao中的updateStudentInfoById方法更新学生数据
-                                // 使用反射动态调用教师或学生Dao中的这个方法
-                                Method method = playDaoClass.getMethod("update" + playStr + "InfoById",
-                                        String.class, String.class, String.class);
-                                System.out.println(id+key + newValue);
-                                Object invoke = method.invoke(playDaoClass.newInstance(), id, key, newValue);
-//                                Student student = StudentDao.updateStudentInfoById(id, key, newValue);
-                                if(invoke == null) {
-                                    JsonResponse.jsonResponse(resp, 400, "修改失败！！");
+                                // 4. 确保newValue字段合法（反射！！）
+                                if(!CheckParametersUtil.checkValueByKey(key, newValue)) {
+                                    JsonResponse.jsonResponse(resp, 400, "新值不合法！");
                                 } else {
-                                    // 6. 将更新后的Student()对象返回
-                                    JsonResponse.jsonResponse(resp, invoke);
+                                    // 5. 调用StudentDao中的updateStudentInfoById方法更新学生数据
+                                    // 使用反射动态调用教师或学生Dao中的这个方法
+                                    Method method = playDaoClass.getMethod("update" + playStr + "InfoById",
+                                            String.class, String.class, String.class);
+                                    System.out.println(id+key + newValue);
+                                    Object invoke = method.invoke(playDaoClass.newInstance(), id, key, newValue);
+//                                Student student = StudentDao.updateStudentInfoById(id, key, newValue);
+                                    if(invoke == null) {
+                                        JsonResponse.jsonResponse(resp, 400, "修改失败！！");
+                                    } else {
+                                        // 6. 将更新后的Student()对象返回
+                                        JsonResponse.jsonResponse(resp, invoke);
+                                    }
                                 }
                             }
                         }

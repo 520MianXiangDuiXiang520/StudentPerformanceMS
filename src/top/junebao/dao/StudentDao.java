@@ -18,7 +18,11 @@ public class StudentDao {
      */
     public static Student getStudentInfoById(String id){
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "SELECT * FROM student WHERE id=?";
+//        String sql = "SELECT * FROM student WHERE id=?";
+        // 连接student表和studentClass表，查询学生所有信息
+        String sql = "SELECT student.id, name, sex, tel, place, password," +
+                " studentClass.className AS studentClass, studentClass.magor FROM " +
+                "student, studentClass WHERE student.id = ? AND student.student_class = studentClass.className;";
         List<Student> query = jdbcTemplate.query(sql, new BeanPropertyRowMapper<Student>(Student.class), id);
         if(query.size() <= 0)
             return null;
