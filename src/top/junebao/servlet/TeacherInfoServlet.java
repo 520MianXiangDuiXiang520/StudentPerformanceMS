@@ -23,6 +23,5 @@ public class TeacherInfoServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("play", "Teacher");
         req.getRequestDispatcher("/UserInfoServlet").forward(req, resp);
-        // TODO 私有属性不能被反射获取到，一个BUG
     }
 }

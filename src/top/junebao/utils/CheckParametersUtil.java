@@ -95,7 +95,7 @@ public class CheckParametersUtil {
             return false;
         }
         try {
-            Field field1 = classT.getField(field);
+            Field field1 = classT.getDeclaredField(field);
             return true;
         } catch (NoSuchFieldException e) {
             return false;
