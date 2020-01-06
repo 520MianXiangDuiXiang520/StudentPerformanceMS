@@ -35,9 +35,8 @@ public class SCDao {
      * 查询某个学生的所有科目的成绩
      * @param Sno 学号
      * @return 返回查询到的list
-     * @throws JsonProcessingException
      */
-    public static List<Map<String, Object>> selectSCBySno(String Sno) throws JsonProcessingException {
+    public static List<Map<String, Object>> selectSCBySno(String Sno) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
         String sql = "SELECT student.id AS studentId, student.NAME AS studentName," +
                 " course.id AS courseID, course.NAME AS courseName, sc.score," +
@@ -51,5 +50,18 @@ public class SCDao {
             return null;
         else
             return rows;
+    }
+
+    /**
+     * 查询某个班某门课所有人的信息和成绩
+     * @param classId 班号
+     * @param cno 课号
+     * @return List<Map<String, Object>>
+     */
+    public static List<Map<String, Object>> selectAllStudentScoreByClassIdCno(String classId, String cno) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT student.id AS studentId, student.name AS studentName, student.tel, sc.score " +
+                "FROM student, sc WHERE student.student_class =  ? AND sc.cno = ? AND student.id = sc.sno ";
+        return jdbcTemplate.queryForList(sql, classId, cno);
     }
 }
