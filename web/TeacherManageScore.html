@@ -66,8 +66,13 @@
                         <td class="success">{{v['studentName']}}</td>
                         <td class="warning">{{v['sex']}}</td>
                         <td class="danger">{{v['tel']}}</td>
-                        <td class="info">{{v['score']}}</td>
-                        <td><button>修改</button></td>
+                        <td class="info">
+                            <input type="text" :placeholder="v['score']" v-model="v['score']">
+                        </td>
+
+                        <td @click="updateScore(classData['classId'], v['studentId'], classData['courseId'], v['score'])">
+                            <button>修改</button>
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -83,9 +88,38 @@
             classes: {},
             studentList: [],
             courseName: "",
-            courseId: ""
+            courseId: "",
+
         },
         methods: {
+            updateScore: function(className, studentId, sourceId, newScore) {
+                let self = this;
+                reqwest({
+                    url: 'TeacherManageScoreServlet'
+                    , method: 'post'
+                    , data: {
+                        className: className,
+                        sourceId: sourceId,
+                        studentId: studentId,
+                        newScore: newScore
+                    }
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            alert("录入成功");
+                            self.classes = data['data']['classes'];
+                            self.classData = data['data']['classData'];
+                            self.courseId = data['data']['classData']['courseId'];
+                            self.courseName = data['data']['classData']['courseName'];
+                            self.studentList = data['data']['classData']['studentList'];
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                })
+            },
             getManageScore: function(className, courseName) {
                 let self = this;
                 reqwest({

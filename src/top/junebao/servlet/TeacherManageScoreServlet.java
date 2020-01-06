@@ -1,7 +1,6 @@
 package top.junebao.servlet;
 
 import top.junebao.dao.SCDao;
-import top.junebao.dao.StudentClassDao;
 import top.junebao.dao.TCDao;
 import top.junebao.domain.User;
 import top.junebao.interceptor.Auth;
@@ -21,7 +20,73 @@ import java.util.Map;
 @WebServlet("/TeacherManageScoreServlet")
 public class TeacherManageScoreServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String id;
+        String className, studentId, courseId, newScoreStr;
+        float newScore = 0;
+        SetType.set(request, response);
+        boolean auth = Auth.auth(request, response);
+        if(!auth){
+            JsonResponse.jsonResponse(response, 401, "您还没登录");
+        } else{
+            User user = (User) request.getAttribute("user");
+            id = user.id;
+            className = request.getParameter("className");
+            studentId = request.getParameter("studentId");
+            courseId = request.getParameter("sourceId");
+            newScoreStr = request.getParameter("newScore");
+            if(className == null || studentId == null || courseId == null || newScoreStr == null) {
+                JsonResponse.jsonResponse(response, 400, "参数缺失");
+            } else {
+                try{
+                    newScore =  Float.parseFloat(newScoreStr);
+                    if(newScore < 0) {
+                        JsonResponse.jsonResponse(response, 400, "成绩不符合要求!！");
+                    } else {
+                        boolean b = SCDao.updateStudentScoreBySnoCno(studentId, courseId, newScore);
+                        if(!b) {
+                            JsonResponse.jsonResponse(response, 400, "学号或课程不存在，修改失败！");
+                        } else {
+                            Object obj = TCDao.selectClassAndCourseByTno(id);
+                            if(obj == null) {
+                                // 3. 如果没有查询到老师授课信息，返回空
+                                JsonResponse.jsonResponse(response, 2000, "该老师没有授课信息");
+                            }else {
+                                requestWithArg(response, className, courseId, obj);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JsonResponse.jsonResponse(response, 400, "成绩不符合要求！");
+                }
+            }
+        }
 
+    }
+
+    /**
+     * 请求携带参数
+     * @param response 响应
+     * @param className 参数1，班级名
+     * @param courseId 参数2， 课程名
+     * @param obj
+     * @throws IOException
+     */
+    private void requestWithArg(HttpServletResponse response, String className, String courseId, Object obj) throws IOException {
+        if(!teacherHasClassCourse((List<Map<String, Object>>) obj, courseId, className)){
+            // 判断老师有没有带这门课
+            JsonResponse.jsonResponse(response, 400, "参数错误，该老师没有这门课的任课记录");
+        } else {
+            String courseName = "null";
+            for (Map m: (List<Map<String, Object>>) obj
+            ) {
+                if(m.get("courseId").equals(courseId)) {
+                    courseName = (String)m.get("courseName");
+                    break;
+                }
+            }
+            getResult(response, courseId, className, obj, courseName);
+        }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -47,22 +112,8 @@ public class TeacherManageScoreServlet extends HttpServlet {
                 className = request.getParameter("class");
                 courseId = request.getParameter("course");
                 if(className != null && courseId != null) {
-                    // 判断老师有没有带这门课
-                    if(!teacherHasClassCourse((List<Map<String, Object>>) obj, courseId, className)){
-                        JsonResponse.jsonResponse(response, 400, "参数错误，该老师没有这门课的任课记录");
-                    } else {
-                        String courseName = "null";
-                        for (Map m: (List<Map<String, Object>>) obj
-                             ) {
-                            if(m.get("courseId").equals(courseId)) {
-                                courseName = (String)m.get("courseName");
-                                break;
-                            }
-                        }
-                        getResult(response, courseId, className, obj, courseName);
-                    }
-
                     // 4. 如果GET请求中携带了class和course参数，就判断这个老师有没有带这个班，如果带了，就返回这个班所有人信息
+                    requestWithArg(response, className, courseId, obj);
                 } else {
                     // 5. 如果GET请求没携带参数，则默认返回obj中第一班的信息(第一次请求)
                     // 5. 1 从Obj 中拿到第一个className

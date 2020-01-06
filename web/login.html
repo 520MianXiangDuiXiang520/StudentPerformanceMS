@@ -79,11 +79,11 @@
 
             login: function () {
                 let self = this;
-                let servletURL = "http://localhost:8080/SPMS/StudentLoginServlet";
-                let indexURL = "http://localhost:8080/SPMS/StudentIndex.html";
+                let servletURL = "StudentLoginServlet";
+                let indexURL = "StudentIndex.html";
                 if(this.type === '0') {
-                    servletURL = "http://localhost:8080/SPMS/TeacherLoginServlet";
-                    indexURL = "http://localhost:8080/SPMS/TeacherIndex.html";
+                    servletURL = "TeacherLoginServlet";
+                    indexURL = "TeacherIndex.html";
                 }
                 reqwest({
                     url: servletURL

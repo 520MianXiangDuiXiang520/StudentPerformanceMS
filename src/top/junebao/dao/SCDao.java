@@ -64,4 +64,18 @@ public class SCDao {
                 "FROM student, sc WHERE student.student_class =  ? AND sc.cno = ? AND student.id = sc.sno ";
         return jdbcTemplate.queryForList(sql, classId, cno);
     }
+
+    /**
+     * 修改某位同学的某门课成绩
+     * @param sno
+     * @param cno
+     * @param newScore
+     * @return
+     */
+    public static boolean updateStudentScoreBySnoCno(String sno, String cno, float newScore) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "UPDATE sc SET score = ? WHERE sno = ? AND cno = ?";
+        int update = jdbcTemplate.update(sql, newScore, sno, cno);
+        return update == 1;
+    }
 }
