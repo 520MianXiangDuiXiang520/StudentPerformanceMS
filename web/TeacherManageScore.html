@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生成绩</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.bootcss.com/reqwest/2.0.5/reqwest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/diquick@1.4.21/diquick.css">
+    <script src="https://unpkg.com/diquick@1.4.21/diquick.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+<div id="app" >
+    <div id="left">
+        <div id="toggle">
+            <img id="headImage" src="static/login/image/bg-01.jpg" class="circle border" style="margin-top: 90px">
+            <div class="accordion" id="accordionExample">
+
+                <div class="card" v-for="v in classes">
+                    <div class="card-header" id="headingOne">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse"
+                                    :data-target="'#' + v['courseId']" aria-expanded="true" aria-controls="collapseOne">
+                                {{v['courseName']}}
+                            </button>
+                        </h2>
+                    </div>
+                    <div :id="v['courseId']" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+                        <div class="card-body" v-for="i in v['classes']">
+                            <p @click="getManageScore(i, v['courseId'])">{{i}}</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="main">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">成绩管理</div>
+                <div class="panel-body">
+                    <p>成绩录入与管理</p>
+                    <p>{{courseName}}</p>
+                    <p>{{courseId}}</p>
+                </div>
+
+                <!-- Table -->
+                <table class="table table-hover">
+                    <tr>
+                        <th>学 号</th>
+                        <th>姓 名</th>
+                        <th>性 别</th>
+                        <th>联 系 方 式</th>
+                        <th>成 绩</th>
+                        <th>操 作</th>
+                    </tr>
+                    <tr v-for="v in studentList">
+                        <td class="active">{{v['studentId']}}</td>
+                        <td class="success">{{v['studentName']}}</td>
+                        <td class="warning">{{v['sex']}}</td>
+                        <td class="danger">{{v['tel']}}</td>
+                        <td class="info">{{v['score']}}</td>
+                        <td><button>修改</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data: {
+            classData: {},
+            classes: {},
+            studentList: [],
+            courseName: "",
+            courseId: ""
+        },
+        methods: {
+            getManageScore: function(className, courseName) {
+                let self = this;
+                reqwest({
+                    url: 'TeacherManageScoreServlet'
+                    , method: 'get'
+                    , data: {
+                        class: className,
+                        course: courseName
+                    }
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            self.classes = data['data']['classes'];
+                            self.classData = data['data']['classData'];
+                            self.courseId = data['data']['classData']['courseId'];
+                            self.courseName = data['data']['classData']['courseName'];
+                            self.studentList = data['data']['classData']['studentList'];
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                })
+            },
+            getData: function () {
+                let self = this;
+                reqwest({
+                    url: 'TeacherManageScoreServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            self.classes = data['data']['classes'];
+                            self.classData = data['data']['classData'];
+                            self.courseId = data['data']['classData']['courseId'];
+                            self.courseName = data['data']['classData']['courseName'];
+                            self.studentList = data['data']['classData']['studentList'];
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                })
+            },
+        },
+        mounted(){
+            this.getData()
+        }
+    })
+</script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/umd/popper.min.js" integrity="sha384-L2pyEeut/H3mtgCBaUNw7KWzp5n9+4pDQiExs933/5QfaTh8YStYFFkOzSoXjlTb" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>

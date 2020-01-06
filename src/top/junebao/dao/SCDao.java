@@ -60,7 +60,7 @@ public class SCDao {
      */
     public static List<Map<String, Object>> selectAllStudentScoreByClassIdCno(String classId, String cno) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "SELECT student.id AS studentId, student.name AS studentName, student.tel, sc.score " +
+        String sql = "SELECT student.id AS studentId, student.name AS studentName, student.tel, student.sex, sc.score " +
                 "FROM student, sc WHERE student.student_class =  ? AND sc.cno = ? AND student.id = sc.sno ";
         return jdbcTemplate.queryForList(sql, classId, cno);
     }

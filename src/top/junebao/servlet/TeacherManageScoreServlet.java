@@ -103,13 +103,15 @@ public class TeacherManageScoreServlet extends HttpServlet {
         Map<String, Object> classData;
         Map<String, Object> result;
         List<Map<String, Object>> maps = SCDao.selectAllStudentScoreByClassIdCno(className, courseId);
+        System.out.println(maps);
         classData = new HashMap<>();
         classData.put("courseId", courseId);
         classData.put("courseName", courseName);
         classData.put("studentList", maps);
         classData.put("classId", className);
+        System.out.println(classData);
         result = new HashMap<>();
-        result.put("class", obj);
+        result.put("classes", obj);
         result.put("classData", classData);
         JsonResponse.jsonResponse(response, 200, result, "ok");
     }
