@@ -4,6 +4,7 @@ import top.junebao.dao.SCDao;
 import top.junebao.dao.TCDao;
 import top.junebao.domain.User;
 import top.junebao.interceptor.Auth;
+import top.junebao.interceptor.Power;
 import top.junebao.utils.JsonResponse;
 import top.junebao.utils.SetType;
 
@@ -103,25 +104,29 @@ public class TeacherManageScoreServlet extends HttpServlet {
         } else{
             User user = (User) request.getAttribute("user");
             id = user.id;
-            // 2. 调用TCDao中的selectClassAndCourseByTno()方法，获取老师授课信息
-            Object obj = TCDao.selectClassAndCourseByTno(id);
-            if(obj == null) {
-                // 3. 如果没有查询到老师授课信息，返回空
-                JsonResponse.jsonResponse(response, 2000, "该老师没有授课信息");
-            }else {
-                className = request.getParameter("class");
-                courseId = request.getParameter("course");
-                if(className != null && courseId != null) {
-                    // 4. 如果GET请求中携带了class和course参数，就判断这个老师有没有带这个班，如果带了，就返回这个班所有人信息
-                    requestWithArg(response, className, courseId, obj);
-                } else {
-                    // 5. 如果GET请求没携带参数，则默认返回obj中第一班的信息(第一次请求)
-                    // 5. 1 从Obj 中拿到第一个className
-                    String firstClassName = (String)((List)((Map) ((List) obj).get(0)).get("classes")).get(0);
-                    String firstCourseId = (String)(((Map)((List) obj).get(0)).get("courseId"));
-                    String firstCourseName = (String)(((Map)((List) obj).get(0)).get("courseName"));
-                    // 5.2 调用StudentClassDao中的selectAllStudentByClassId()方法获取该班的所有学生
-                    getResult(response, firstCourseId, firstClassName, obj, firstCourseName);
+            if(!Power.power(id, "teacher", response)){
+                JsonResponse.jsonResponse(response, 403, "无权访问！");
+            } else {
+                // 2. 调用TCDao中的selectClassAndCourseByTno()方法，获取老师授课信息
+                Object obj = TCDao.selectClassAndCourseByTno(id);
+                if(obj == null) {
+                    // 3. 如果没有查询到老师授课信息，返回空
+                    JsonResponse.jsonResponse(response, 2000, "该老师没有授课信息");
+                }else {
+                    className = request.getParameter("class");
+                    courseId = request.getParameter("course");
+                    if(className != null && courseId != null) {
+                        // 4. 如果GET请求中携带了class和course参数，就判断这个老师有没有带这个班，如果带了，就返回这个班所有人信息
+                        requestWithArg(response, className, courseId, obj);
+                    } else {
+                        // 5. 如果GET请求没携带参数，则默认返回obj中第一班的信息(第一次请求)
+                        // 5. 1 从Obj 中拿到第一个className
+                        String firstClassName = (String)((List)((Map) ((List) obj).get(0)).get("classes")).get(0);
+                        String firstCourseId = (String)(((Map)((List) obj).get(0)).get("courseId"));
+                        String firstCourseName = (String)(((Map)((List) obj).get(0)).get("courseName"));
+                        // 5.2 调用StudentClassDao中的selectAllStudentByClassId()方法获取该班的所有学生
+                        getResult(response, firstCourseId, firstClassName, obj, firstCourseName);
+                    }
                 }
             }
         }

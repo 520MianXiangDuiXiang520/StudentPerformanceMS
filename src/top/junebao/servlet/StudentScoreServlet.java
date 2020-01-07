@@ -3,6 +3,7 @@ package top.junebao.servlet;
 import top.junebao.dao.SCDao;
 import top.junebao.domain.User;
 import top.junebao.interceptor.Auth;
+import top.junebao.interceptor.Power;
 import top.junebao.utils.JsonResponse;
 import top.junebao.utils.SetType;
 
@@ -36,14 +37,18 @@ public class StudentScoreServlet extends HttpServlet {
         if(!auth){
             JsonResponse.jsonResponse(response, 401, "您还没登录");
         } else{
-            User user = (User) request.getAttribute("user");
-            id = user.id;
-            // 2. 调用SCDao中的selectSCBySno查询学生成绩
-            List<Map<String, Object>> selectResult = SCDao.selectSCBySno(id);
-            if(selectResult == null){
-                JsonResponse.jsonResponse(response, 2000, "没有查询到任何信息");
+            if(!Power.power(id, "student", response)){
+                JsonResponse.jsonResponse(response, 403, "无权访问！");
             } else {
-                JsonResponse.jsonResponse(response, 200, selectResult, "ok");
+                User user = (User) request.getAttribute("user");
+                id = user.id;
+                // 2. 调用SCDao中的selectSCBySno查询学生成绩
+                List<Map<String, Object>> selectResult = SCDao.selectSCBySno(id);
+                if(selectResult == null){
+                    JsonResponse.jsonResponse(response, 2000, "没有查询到任何信息");
+                } else {
+                    JsonResponse.jsonResponse(response, 200, selectResult, "ok");
+                }
             }
         }
 
