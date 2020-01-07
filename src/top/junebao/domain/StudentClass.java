@@ -1,25 +1,15 @@
 package top.junebao.domain;
 
 public class StudentClass {
-    private int id;
     private String className;
     private String magor;
 
     @Override
     public String toString() {
         return "StudentClass{" +
-                "id=" + id +
                 ", className='" + className + '\'' +
                 ", magor='" + magor + '\'' +
                 '}';
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getClassName() {

@@ -43,7 +43,7 @@ public class SCDao {
                 " course.cscore, course.ctime, teacher.NAME AS teacherName" +
                 "  FROM student, sc, course, tc, teacher " +
                 "WHERE student.id = ? AND student.id = sc.sno " +
-                "AND course.id = sc.cno AND student.student_class = tc.classno" +
+                "AND course.id = sc.cno AND student.studentClass = tc.classno" +
                 " AND course.id = tc.cno AND teacher.id = tc.tno;";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, Sno);
         if(rows.size() < 1)
@@ -61,7 +61,7 @@ public class SCDao {
     public static List<Map<String, Object>> selectAllStudentScoreByClassIdCno(String classId, String cno) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
         String sql = "SELECT student.id AS studentId, student.name AS studentName, student.tel, student.sex, sc.score " +
-                "FROM student, sc WHERE student.student_class =  ? AND sc.cno = ? AND student.id = sc.sno ";
+                "FROM student, sc WHERE student.studentClass =  ? AND sc.cno = ? AND student.id = sc.sno ";
         return jdbcTemplate.queryForList(sql, classId, cno);
     }
 

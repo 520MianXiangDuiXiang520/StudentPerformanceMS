@@ -34,7 +34,7 @@ public class SUTeacherManageServlet extends HttpServlet {
                 password = (String) map.get("password");
                 // 判断值是否合法
                 if(CheckParametersUtil.checkValueByKey("id", id) && CheckParametersUtil.checkValueByKey("name", name)
-                && CheckParametersUtil.checkValueByKey("password", password)){
+                        && CheckParametersUtil.checkValueByKey("password", password)){
                     boolean b = TeacherDao.insertNewTeacher(id, name, password);
                     if(b) {
                         JsonResponse.jsonResponse(response, 200, "ok");

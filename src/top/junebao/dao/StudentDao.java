@@ -7,6 +7,7 @@ import top.junebao.domain.User;
 import top.junebao.utils.DruidUtils;
 
 import java.util.List;
+import java.util.Map;
 
 public class StudentDao {
     private static JdbcTemplate jdbcTemplate = null;
@@ -22,7 +23,17 @@ public class StudentDao {
         // 连接student表和studentClass表，查询学生所有信息
         String sql = "SELECT student.id, name, sex, tel, place, password," +
                 " studentClass.className AS studentClass, studentClass.magor FROM " +
-                "student, studentClass WHERE student.id = ? AND student.student_class = studentClass.className;";
+                "student, studentClass WHERE student.id = ? AND student.studentClass = studentClass.className;";
+        List<Student> query = jdbcTemplate.query(sql, new BeanPropertyRowMapper<Student>(Student.class), id);
+        if(query.size() <= 0)
+            return null;
+        else
+            return query.get(0);
+    }
+
+    public static Student isHaveStudent(String id) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT * FROM student WHERE id = ?";
         List<Student> query = jdbcTemplate.query(sql, new BeanPropertyRowMapper<Student>(Student.class), id);
         if(query.size() <= 0)
             return null;
@@ -44,7 +55,39 @@ public class StudentDao {
         if(row != 1){
             return null;
         } else {
-            return getStudentInfoById(id);
+            if(key.equals("id")){
+                return isHaveStudent(newValue);
+            }
+            return isHaveStudent(id);
         }
+    }
+
+    /**
+     * 按班级顺序返回一些学生
+     * @return
+     */
+    public static List<Student> selectFirstClassStudents(int num) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT * FROM student ORDER BY student.student_class LIMIT "+ num +";";
+        List<Student> maps = jdbcTemplate.query(sql, new BeanPropertyRowMapper<Student>(Student.class));
+        return maps;
+    }
+
+
+    public static List<Map<String, Object>> selectStudentsByClassName(String className) {
+        return StudentClassDao.selectAllStudentByClassId(className);
+    }
+
+    public static boolean insertNewStudent(String id, String name, String password, String className) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "INSERT INTO student(id, name, password, studentClass) VALUES(?,?,?,?);";
+        int update = jdbcTemplate.update(sql, id, name, password, className);
+        return update == 1;
+    }
+
+    public static boolean deleteStudent(String id) {
+        String sql = "DELETE FROM student WHERE  id= ?";
+        int row = jdbcTemplate.update(sql, id);
+        return row == 1;
     }
 }

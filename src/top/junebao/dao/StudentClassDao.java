@@ -1,6 +1,8 @@
 package top.junebao.dao;
 
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import top.junebao.domain.Student;
 import top.junebao.domain.StudentClass;
 import top.junebao.utils.DruidUtils;
 
@@ -22,9 +24,9 @@ public class StudentClassDao {
     private static boolean creatViewWhenInsert(String className) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
         String sql = "CREATE VIEW class" + className + " AS SELECT student.id AS studentId," +
-                " student.name AS studentName,student.sex, student.student_class AS studentClass," +
+                " student.name AS studentName,student.sex, student.studentClass AS studentClass," +
                 " student.place, student.tel, studentclass.magor AS Magor FROM student, studentclass" +
-                " WHERE studentclass.className = ? AND student.student_class = studentclass.className;";
+                " WHERE studentclass.className = ? AND student.studentClass = studentclass.className;";
         int update = jdbcTemplate.update(sql, className);
         return update == 1;
     }
@@ -37,7 +39,24 @@ public class StudentClassDao {
      */
     public static List<Map<String, Object>> selectAllStudentByClassId(String classId) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "SELECT student.id, student.name, student.sex FROM student WHERE student.student_class = ?;";
-        return jdbcTemplate.queryForList(sql, classId);
+        String sql = "SELECT * FROM student WHERE student.studentClass = ?;";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, classId);
+        if(maps.size() < 1) {
+            return null;
+        }else {
+            return maps;
+        }
     }
+
+    public static StudentClass selectStudentClassByClassName(String className) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT * FROM studentClass WHERE className = ?;";
+        List<StudentClass> query = jdbcTemplate.query(sql, new BeanPropertyRowMapper<StudentClass>(StudentClass.class), className);
+        if(query.size() < 1){
+            return null;
+        } else {
+            return query.get(0);
+        }
+    }
+
 }
