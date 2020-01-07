@@ -37,11 +37,11 @@ public class StudentScoreServlet extends HttpServlet {
         if(!auth){
             JsonResponse.jsonResponse(response, 401, "您还没登录");
         } else{
+            User user = (User) request.getAttribute("user");
+            id = user.id;
             if(!Power.power(id, "student", response)){
                 JsonResponse.jsonResponse(response, 403, "无权访问！");
             } else {
-                User user = (User) request.getAttribute("user");
-                id = user.id;
                 // 2. 调用SCDao中的selectSCBySno查询学生成绩
                 List<Map<String, Object>> selectResult = SCDao.selectSCBySno(id);
                 if(selectResult == null){

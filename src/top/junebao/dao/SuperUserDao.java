@@ -25,4 +25,15 @@ public class SuperUserDao {
         else
             return query.get(0);
     }
+
+    public static Object selectAllTeacher() {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT * FROM teacher ";
+        List<Teacher> query = jdbcTemplate.query(sql, new BeanPropertyRowMapper<Teacher>(Teacher.class));
+        if(query.size() < 1) {
+            return null;
+        } else {
+            return query;
+        }
+    }
 }

@@ -42,4 +42,25 @@ public class TeacherDao {
             return getTeacherInfoById(id);
         }
     }
+
+    /**
+     * 添加一个新老师
+     * @param id
+     * @param name
+     * @param password
+     * @return
+     */
+    public static boolean insertNewTeacher(String id, String name, String password) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "INSERT INTO teacher(id, name, password) VALUES(?, ?, ?) ";
+        int row = jdbcTemplate.update(sql, id, name, password);
+        return row == 1;
+    }
+
+    public static boolean deleteTeacher(String id) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "DELETE FROM teacher WHERE  id= ?";
+        int row = jdbcTemplate.update(sql, id);
+        return row == 1;
+    }
 }
