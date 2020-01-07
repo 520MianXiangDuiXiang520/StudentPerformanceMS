@@ -91,9 +91,6 @@ public class CheckParametersUtil {
      * @return 是返回true，否则返回false
      */
     public static boolean checkFieldIsInClass(Class classT, String field){
-        if("id".equals(field)){
-            return false;
-        }
         try {
             Field field1 = classT.getDeclaredField(field);
             return true;
@@ -119,8 +116,8 @@ public class CheckParametersUtil {
         System.out.println(name);
         try {
             Method method = CheckParametersUtil.class.getMethod(name, String.class);
-            method.invoke(new CheckParametersUtil(),value);
-            return true;
+            Object invoke = method.invoke(new CheckParametersUtil(), value);
+            return (boolean) invoke;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
             return false;
