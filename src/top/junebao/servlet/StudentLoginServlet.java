@@ -14,6 +14,7 @@ import java.io.IOException;
 public class StudentLoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         SetType.set(request, response);
+        // 共享数据
         request.setAttribute("play", "student");
         request.getRequestDispatcher("/loginServlet").forward(request, response);
     }

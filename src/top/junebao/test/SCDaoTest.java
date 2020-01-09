@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import top.junebao.dao.SCDao;
 import top.junebao.domain.SC;
 
+import java.util.List;
+import java.util.Map;
+
 public class SCDaoTest {
 
     @Test
@@ -15,5 +18,11 @@ public class SCDaoTest {
     @Test
     public void selectSCBySnoTest() throws JsonProcessingException {
         SCDao.selectSCBySno("LS-N1");
+    }
+
+    @Test
+    public void selectAllChoiceCId() {
+        List<Map<String, Object>> maps = SCDao.selectAllChoiceC("SG-N1");
+        System.out.println(maps);
     }
 }

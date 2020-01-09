@@ -17,6 +17,7 @@ import java.util.Map;
 
 @WebServlet("/SUTCManageServlet")
 public class SUTCManageServlet extends HttpServlet {
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         SetType.set(request, response);
         String teacherId, courseId, className;
@@ -24,27 +25,37 @@ public class SUTCManageServlet extends HttpServlet {
             // 需要三个参数 id, key, value
             String fromDataString = JSONUtil.toFormDataString(request);
             Map<String, Object> map = JSONUtil.fromDataToMap(fromDataString);
-            if (!CheckParametersUtil.checkRequestParam(map, new ArrayList<>(Arrays.asList("teacherId", "courseId", "className")))) {
+            if (!CheckParametersUtil.checkRequestParam(map, new ArrayList<>(Arrays.asList("teacherId", "courseId")))) {
                 JsonResponse.jsonResponse(response, 400, "参数缺失");
             } else {
+
                 teacherId = (String) map.get("teacherId");
                 courseId = (String) map.get("courseId");
-                className = (String) map.get("className");
-                // 判断老师是否存在
-                if(!TeacherDao.isHaveTeacher(teacherId) || !CourseDao.isHaveCourse(courseId)){
-                    JsonResponse.jsonResponse(response, 400, "教师或课程不存在");
-                } else {
-                    if(TCDao.isHaveTC(teacherId, courseId, className)) {
-                        JsonResponse.jsonResponse(response, 400, "该记录已经存在！");
-                    } else {
-                        boolean b = TCDao.insertNewTC(teacherId, courseId, className);
-                        if(b){
-                            doGet(request, response);
-                        } else {
-                            JsonResponse.jsonResponse(response, 500, "添加失败！");
-                        }
-                    }
-                }
+                // 如果这门课是选修就可以不用填className
+                boolean choiceCourse = CourseDao.isChoiceCourse(courseId);
+                if(map.get("className") == null && !choiceCourse){
+                   JsonResponse.jsonResponse(response, 400, "参数欠缺！！");
+               } else {
+                   // 判断老师是否存在
+                   if(choiceCourse)
+                       className = null;
+                   else
+                       className = (String) map.get("className");
+                   if(!TeacherDao.isHaveTeacher(teacherId) || !CourseDao.isHaveCourse(courseId)){
+                       JsonResponse.jsonResponse(response, 400, "教师或课程不存在");
+                   } else {
+                       if(TCDao.isHaveTC(teacherId, courseId, className)) {
+                           JsonResponse.jsonResponse(response, 400, "该记录已经存在！");
+                       } else {
+                           boolean b = TCDao.insertNewTC(teacherId, courseId, className);
+                           if(b){
+                               doGet(request, response);
+                           } else {
+                               JsonResponse.jsonResponse(response, 500, "添加失败！");
+                           }
+                       }
+                   }
+               }
             }
         }
     }

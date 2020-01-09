@@ -45,6 +45,7 @@ public class UserInfoServlet extends HttpServlet {
                     JsonResponse.jsonResponse(response, 403, "无权访问！");
                 } else {
                     try {
+                        // 反射
                         Class<?> aClass = Class.forName("top.junebao.dao."+play.toString() + "Dao");
                         Method method = aClass.getMethod("get" + play.toString() + "InfoById", String.class);
                         objUser = method.invoke(aClass.newInstance(), id);
@@ -114,7 +115,6 @@ public class UserInfoServlet extends HttpServlet {
                                         // 使用反射动态调用教师或学生Dao中的这个方法
                                         Method method = playDaoClass.getMethod("update" + playStr + "InfoById",
                                                 String.class, String.class, String.class);
-                                        System.out.println(id+key + newValue);
                                         Object invoke = method.invoke(playDaoClass.newInstance(), id, key, newValue);
 //                                Student student = StudentDao.updateStudentInfoById(id, key, newValue);
                                         if(invoke == null) {

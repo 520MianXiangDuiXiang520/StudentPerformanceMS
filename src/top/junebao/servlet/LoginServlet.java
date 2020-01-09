@@ -27,7 +27,7 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         SetType.set(req, resp);
         String params = JSONUtil.toFormDataString(req);
-        System.out.println(params);
+        // 把id和password封装为User对象
         User loginUser = (User) JSONUtil.formDataToObject(params, User.class);
         Object play = req.getAttribute("play");
         if("student".equals(play.toString()) || "teacher".equals(play.toString()) || "superUser".equals(play.toString())){
@@ -47,7 +47,6 @@ public class LoginServlet extends HttpServlet {
             // 登陆成功，设置session
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            System.out.println("==========success==========");
             JsonResponse.jsonResponse(resp, 200, user, "ok");
         } else {
             System.out.println("=================用户名或密码错误=================");

@@ -130,7 +130,7 @@
             },
             innerSUUTCManage: function() {
                 /**
-                 * 加载个人中心页面
+                 * 加载教师授课页面
                  */
                 this.class1 = false;
                 this.class2 = false;
@@ -179,7 +179,7 @@
             },
             innerSUStudentM: function() {
                 /**
-                 * 加载教师管理
+                 * 加载学生管理
                  */
                 this.class1 = false;
                 this.class2 = false;
@@ -193,6 +193,9 @@
                 main.innerHTML = ("<iframe id='iframe1' frameborder = 0 width = 100% height=3000 marginheight = 0 marginwidth = 0 scrolling = no" +
                     " src = 'SUStudentManage.html' ></iframe >")
             },
+            /**
+             * 加载课程管理
+             */
             innerSUCourseM: function () {
                 this.class1 = false;
                 this.class2 = false;
@@ -238,7 +241,8 @@
             }
         },
         mounted(){
-            this.getData()
+            this.getData();
+            this.innerSUUserInfo();
         }
     })
 </script>

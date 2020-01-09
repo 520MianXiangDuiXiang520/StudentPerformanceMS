@@ -41,10 +41,16 @@ public class CourseDao {
         }
     }
 
-    public static boolean insertNewCourse(String id, String name) {
+    public static boolean isChoiceCourse(String cno) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "INSERT INTO course(id, name) VALUES(?, ?);";
-        int update = jdbcTemplate.update(sql, id, name);
+        String sql = "SELECT * FROM course WHERE id = ? AND `type` = '选修';";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, cno);
+        return maps.size() == 1;
+    }
+    public static boolean insertNewCourse(String id, String name, String type) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "INSERT INTO course(id, name, type) VALUES(?, ?, ?);";
+        int update = jdbcTemplate.update(sql, id, name, type);
         return update == 1;
     }
 

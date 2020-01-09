@@ -50,6 +50,35 @@
                     </tr>
                 </table>
             </div>
+
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">查看成绩</div>
+                <div class="panel-body">
+                    <p>选修课成绩查询</p>
+                </div>
+
+                <!-- Table -->
+                <table class="table table-hover">
+                    <tr>
+                        <th>课 程 编 号</th>
+                        <th>科 目</th>
+                        <th>任 课 老 师</th>
+                        <th>学 时</th>
+                        <th>学 分</th>
+                        <th>成 绩</th>
+                    </tr>
+<!--                    [{courseName=中国近现代史, Cscore=1.5, Ctime=8, courseId=XX-01-1, score=null, teacherName=万历皇帝}]-->
+                    <tr v-for="v in ccData">
+                        <td class="active">{{v['courseId']}}</td>
+                        <td class="success">{{v['courseName']}}</td>
+                        <td class="warning">{{v['teacherName']}}</td>
+                        <td class="danger">{{v['Ctime']}}</td>
+                        <td class="info">{{v['Cscore']}}</td>
+                        <td>{{v['score']}}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -59,8 +88,26 @@
         el: "#app",
         data: {
             data: {},
+            ccData: []
         },
         methods: {
+            getCCS: function() {
+                let self = this;
+                reqwest({
+                    url: 'StudentChoiceCourseServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            self.ccData = data['data'];
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                })
+            },
             getData: function () {
                 let self = this;
                 reqwest({
@@ -80,7 +127,8 @@
             },
         },
         mounted(){
-            this.getData()
+            this.getData();
+            this.getCCS();
         }
     })
 </script>

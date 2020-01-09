@@ -10,6 +10,21 @@ public class SCDao {
     private static JdbcTemplate jdbcTemplate = null;
 
     /**
+     * 查询学生选修了的所有选修课
+     * @param id 学号
+     * @return
+     */
+    public static List<Map<String, Object>> selectAllChoiceC(String id) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT course.`name` AS courseName, course.Cscore, course.Ctime," +
+                " course.id AS courseId, sc.score, teacher.`name` AS teacherName" +
+                " FROM course, teacher, sc, tc WHERE sc.scstatus='选修' AND sc.sno = ?" +
+                " AND sc.cno = course.id AND tc.cno = course.id AND teacher.id = tc.tno;";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, id);
+        return maps;
+    }
+
+    /**
      * 查询某个学生的某一科目成绩
      * @param Sno 学号
      * @param Cno 课程号

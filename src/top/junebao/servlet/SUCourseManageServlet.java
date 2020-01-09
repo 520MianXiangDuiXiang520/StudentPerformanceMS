@@ -17,7 +17,7 @@ import java.util.*;
 @WebServlet("/SUCourseManageServlet")
 public class SUCourseManageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id, name;
+        String id, name, type;
         SetType.set(request, response);
         if(AuthAndPowerUtils.authAndPower(request, response, "superUser")) {
             // 检查参数（需要Id, name, password 三个必须字段）
@@ -28,9 +28,15 @@ public class SUCourseManageServlet extends HttpServlet {
             } else {
                 id = (String) map.get("id");
                 name = (String) map.get("name");
+                if(map.get("type") != null){
+                    type = (String) map.get("type");
+                } else {
+                    type = "必修";
+                }
+
                 // 判断值是否合法
                 if(id.length() < 10 && name.length() <= 20){
-                    boolean b = CourseDao.insertNewCourse(id, name);
+                    boolean b = CourseDao.insertNewCourse(id, name, type);
                     if(b) {
                         this.doGet(request, response);
                     } else {
