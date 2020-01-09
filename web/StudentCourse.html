@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生成绩</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://cdn.bootcss.com/reqwest/2.0.5/reqwest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/diquick@1.4.21/diquick.css">
+    <script src="https://unpkg.com/diquick@1.4.21/diquick.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+<div id="app" >
+    <div id="left">
+        <div id="toggle">
+            <div class="leftBork">
+                <img id="headImage" src="static/login/image/bg-01.jpg" class="circle border">
+            </div>
+        </div>
+        <div id="main">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">选课</div>
+                <div class="panel-body">
+                    <p>选课管理</p>
+                </div>
+
+                <!-- Table -->
+                <table class="table table-hover">
+                    <tr>
+                        <th>课 程 编 号</th>
+                        <th>科 目</th>
+                        <th>任 课 老 师 ID</th>
+                        <th>任 课 老 师</th>
+                        <th>学 时</th>
+                        <th>学 分</th>
+                        <th>操 作</th>
+                    </tr>
+                    <tr v-for="v in data">
+                        <td class="active">{{v['courseId']}}</td>
+                        <td class="success">{{v['courseName']}}</td>
+                        <td>{{v['teacherId']}}</td>
+                        <td class="warning">{{v['teacherName']}}</td>
+                        <td class="danger">{{v['Ctime']}}</td>
+                        <td class="info">{{v['Cscore']}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" @click="addSCourse(v['courseId'])">选 修</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let vm = new Vue({
+        el: "#app",
+        data: {
+            data: {},
+        },
+        methods: {
+            getData: function () {
+                let self = this;
+                reqwest({
+                    url: 'StudentCourseServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            self.data = data['data'];
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                })
+            },
+
+            addSCourse: function (courseId) {
+                let self = this;
+                alert(courseId);
+                reqwest({
+                    url: 'StudentCourseServlet'
+                    , method: 'post'
+                    , data: {
+                        courseId: courseId
+                    }
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        if(data['code'] === 200){
+                            self.data = data['data'];
+                        } else {
+                            alert(data['msg'])
+                        }
+                    }
+                })
+            }
+        },
+        mounted(){
+            this.getData()
+        }
+    })
+</script>
+</body>
+</html>

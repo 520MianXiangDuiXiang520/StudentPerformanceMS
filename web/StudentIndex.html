@@ -12,8 +12,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
-
     </script>
+    <link rel="stylesheet" href="https://unpkg.com/diquick@1.4.21/diquick.css">
+    <script src="https://unpkg.com/diquick@1.4.21/diquick.js"></script>
 </head>
 <body>
 <div id="app">
@@ -22,27 +23,33 @@
         <div class="container-fluid" style="margin-left: 0;margin-right: 0">
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="navigation-items nav navbar-nav navbar-right" v-if="data.id">
-                    <li v-bind:class="{ current: class1 }"><a href="StudentIndex.html">首页</a></li>
                     <li v-bind:class="{ current: class2 }" @click="innerUserCenter">
                         <a href="javaScript:;">个人中心</a>
                     </li>
-                    <li v-bind:class="{ current: class3 }" @click="innerStudentScore">
-                        <a href="javaScript:;">课程管理</a>
+
+                    <li v-bind:class="{ current: class4 }" @click="innerCourse">
+                        <a href="javaScript:;">选课系统</a>
                     </li>
-                    <li v-bind:class="{ current: class4 }"><a href="#work">成绩管理</a></li>
-                    <li v-bind:class="{ current: class5 }"><a href="#clients">关于</a></li>
-                    <li v-bind:class="{ current: class6 }"><a href="#contact">开源</a></li>
+                    <li v-bind:class="{ current: class3 }" @click="innerStudentScore">
+                        <a href="javaScript:;">成绩查询</a>
+                    </li>
+                    <li  @click="logout">
+                        <a href="javaScript:;">登 出</a>
+                    </li>
+                    <li v-bind:class="{ current: class5 }" @click="innerAbout"><a href="javaScript:;">关于</a></li>
                 </ul>
                 <ul class="navigation-items nav navbar-nav navbar-right" style="margin-right: 250px" v-else>
                     <li v-bind:class="{ current: class1 }">
-                        <a href="http://localhost:8080/SPMS/login.html">登录</a>
+                        <a href="SLogin.html">登录</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-    <div id="main">
+    <div style="max-height:800px" data-scrollbar>
+        <div id="main">
 
+        </div>
     </div>
 </div>
 <script>
@@ -58,6 +65,19 @@
             class6: false
         },
         methods: {
+            logout: function() {
+                reqwest({
+                    url: 'LoginOutServlet'
+                    , method: 'get'
+                    , error: function (err) {
+                        console.log("err!")
+                    }
+                    , success: function (data) {
+                        alert("登出成功");
+                        window.location.href="SLogin.html";
+                    }
+                })
+            },
             getData: function () {
                 let self = this;
                 reqwest({
@@ -74,6 +94,29 @@
                 })
             },
 
+            innerCourse() {
+                this.class1 = false;
+                this.class2 = false;
+                this.class3 = false;
+                this.class4 = true;
+                this.class5 = false;
+                let main = document.getElementById('main');
+                main.innerHTML = ("<iframe id='iframe1' frameborder = 0 width = 100% height=1000 marginheight = 0 marginwidth = 0 scrolling = no" +
+                    " src = 'StudentCourse.html' ></iframe >")
+            },
+
+            innerAbout: function () {
+                this.class1 = false;
+                this.class2 = false;
+                this.class3 = false;
+                this.class4 = false;
+                this.class5 = true;
+                let main = document.getElementById('main');
+                main.innerHTML = ("<iframe id='iframe1' frameborder = 0 width = 100% height=1000 marginheight = 0 marginwidth = 0 scrolling = no" +
+                    " src = 'about.html' ></iframe >")
+
+            },
+
             innerUserCenter: function() {
                 /**
                  * 加载个人中心页面
@@ -85,7 +128,7 @@
                 this.class5 = false;
                 this.class6 = false;
                 let main = document.getElementById('main');
-                main.innerHTML = ("<iframe frameborder = 0 width = 100% height=800 marginheight = 0 marginwidth = 0 scrolling = no" +
+                main.innerHTML = ("<iframe frameborder = 0 width = 100% height=1000 marginheight = 0 marginwidth = 0 scrolling = no" +
                     " src = 'StudentCenter.html' ></iframe >")
             },
             innerStudentScore: function() {
@@ -99,7 +142,7 @@
                 this.class5 = false;
                 this.class6 = false;
                 let main = document.getElementById('main');
-                main.innerHTML = ("<iframe frameborder = 0 width = 100% height=800 marginheight = 0 marginwidth = 0 scrolling = no" +
+                main.innerHTML = ("<iframe frameborder = 0 width = 100% height=1000 marginheight = 0 marginwidth = 0 scrolling = no" +
                     " src = 'StudentScore.html' ></iframe >")
             }
         },

@@ -1,7 +1,8 @@
 package top.junebao.servlet;
 
-import top.junebao.dao.SuperUserDao;
+import top.junebao.dao.CourseDao;
 import top.junebao.dao.TeacherDao;
+import top.junebao.domain.Course;
 import top.junebao.domain.Teacher;
 import top.junebao.utils.*;
 
@@ -11,31 +12,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
-@WebServlet("/SUTeacherManageServlet")
-public class SUTeacherManageServlet extends HttpServlet {
-    // 添加老师
+@WebServlet("/SUCourseManageServlet")
+public class SUCourseManageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id, name, password;
+        String id, name;
         SetType.set(request, response);
         if(AuthAndPowerUtils.authAndPower(request, response, "superUser")) {
             // 检查参数（需要Id, name, password 三个必须字段）
             String fromDataString = JSONUtil.toFormDataString(request);
             Map<String, Object> map = JSONUtil.fromDataToMap(fromDataString);
-            if(!CheckParametersUtil.checkRequestParam(map, new ArrayList<>(Arrays.asList("id", "name", "password")))){
+            if(!CheckParametersUtil.checkRequestParam(map, new ArrayList<>(Arrays.asList("id", "name")))){
                 JsonResponse.jsonResponse(response, 400, "参数缺失");
             } else {
                 id = (String) map.get("id");
                 name = (String) map.get("name");
-                password = (String) map.get("password");
                 // 判断值是否合法
-                if(CheckParametersUtil.checkValueByKey("id", id) && CheckParametersUtil.checkValueByKey("name", name)
-                        && CheckParametersUtil.checkValueByKey("password", password)){
-                    boolean b = TeacherDao.insertNewTeacher(id, name, password);
+                if(id.length() < 10 && name.length() <= 20){
+                    boolean b = CourseDao.insertNewCourse(id, name);
                     if(b) {
                         this.doGet(request, response);
                     } else {
@@ -49,15 +44,40 @@ public class SUTeacherManageServlet extends HttpServlet {
         }
     }
 
-    // 查看老师
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         SetType.set(request, response);
         if(AuthAndPowerUtils.authAndPower(request, response, "superUser")) {
-            JsonResponse.jsonResponse(response, 200, SuperUserDao.selectAllTeacher(), "ok");
+            List<Map<String, Object>> allCourses = CourseDao.getAllCourses();
+            JsonResponse.jsonResponse(response, 200, allCourses, "ok");
         }
     }
 
-    // 修改老师信息
+    private boolean check(String k, String v) {
+        if(k.toLowerCase().equals("cscore")) {
+            try{
+                float v1 = Float.parseFloat(v);
+                return v1 > 0;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else if (k.toLowerCase().equals("ctime")) {
+            try{
+                int i = Integer.parseInt(v);
+                return i > 0;
+            }catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else if(k.toLowerCase().equals("name")){
+            return v.length() <= 20;
+        } else if(k.toLowerCase().equals("id")) {
+            return !CourseDao.isHaveCourse(v);
+        } else {
+            return false;
+        }
+    }
+
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         SetType.set(req, resp);
@@ -73,16 +93,16 @@ public class SUTeacherManageServlet extends HttpServlet {
                 key = (String) map.get("key");
                 value = (String) map.get("value");
                 // 判断 key 是否合法
-                if (!CheckParametersUtil.checkFieldIsInClass(Teacher.class, key)){
+                if (!CheckParametersUtil.checkFieldIsInClass(Course.class, key)){
                     JsonResponse.jsonResponse(resp, 400, "参数错误！");
                 } else {
                     // 判断新值是否合法
-                    if(!CheckParametersUtil.checkValueByKey(key, value)) {
+                    if(!check(key, value)) {
                         JsonResponse.jsonResponse(resp, 400, "新值不合法！");
                     } else {
                         // 调用 teacherDao.
-                        Teacher teacher = TeacherDao.updateTeacherInfoById(id, key, value);
-                        if(teacher == null) {
+                        Object o = CourseDao.updateCourseById(id, key, value);
+                        if(o == null) {
                             JsonResponse.jsonResponse(resp, 500, "修改失败！");
                         } else {
                             this.doGet(req, resp);
@@ -93,25 +113,25 @@ public class SUTeacherManageServlet extends HttpServlet {
         }
     }
 
-    // 删除老师
+    // 删除课程
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String id;
         SetType.set(req, resp);
         if(AuthAndPowerUtils.authAndPower(req, resp, "superUser")) {
-            // 检查参数（需要Id, name, password 三个必须字段）
             String fromDataString = JSONUtil.toFormDataString(req);
             Map<String, Object> map = JSONUtil.fromDataToMap(fromDataString);
-            if(!CheckParametersUtil.checkRequestParam(map, new ArrayList<>(Collections.singletonList("id")))){
+            Object id1 = map.get("id");
+            if(id1 == null){
                 JsonResponse.jsonResponse(resp, 400, "参数缺失");
             } else {
                 id = (String) map.get("id");
                 // 判断值是否合法
                 if(CheckParametersUtil.checkValueByKey("id", id)){
-                    if(TeacherDao.getTeacherInfoById(id) == null) {
-                        JsonResponse.jsonResponse(resp, 400, "老师不存在");
+                    if(!CourseDao.isHaveCourse(id)) {
+                        JsonResponse.jsonResponse(resp, 400, "课程不存在");
                     } else {
-                        boolean b = TeacherDao.deleteTeacher(id);
+                        boolean b = CourseDao.deleteCourse(id);
                         if(b) {
                             doGet(req, resp);
                         } else {
@@ -125,5 +145,4 @@ public class SUTeacherManageServlet extends HttpServlet {
             }
         }
     }
-
 }

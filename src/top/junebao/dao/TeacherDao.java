@@ -25,6 +25,10 @@ public class TeacherDao {
             return query.get(0);
     }
 
+    public static boolean isHaveTeacher(String id) {
+        return getTeacherInfoById(id) != null;
+    }
+
     /**
      * 通过id更新某一的某一项数据
      * @param id 学号

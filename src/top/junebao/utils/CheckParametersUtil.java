@@ -56,6 +56,14 @@ public class CheckParametersUtil {
         return checkStringLen(magor, 1, 10);
     }
 
+    public static boolean checkCScore(float cScore) {
+        return cScore > 0 && cScore < 100;
+    }
+
+    public static boolean checkCTime(int time) {
+        return time > 0 && time < 100;
+    }
+
     public static boolean checkDept(String dept) {
         return checkStringLen(dept, 1, 20);
     }

@@ -1,6 +1,6 @@
 <html lang="zh-CN"><head>
     <meta charset="utf-8">
-    <title>管理员登录</title>
+    <title>学生登录</title>
     <link rel="stylesheet" href="static/css/superLogin.css">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://cdn.bootcss.com/reqwest/2.0.5/reqwest.js"></script>
@@ -9,8 +9,8 @@
 <div class="dowebok">
     <div class="container">
         <div class="left">
-            <div class="login">登陆</div>
-            <div class="eula">尊敬的管理员，您好，请输入账号和密码登录</div>
+            <div class="login">教师登陆</div>
+            <div class="eula">尊敬的老师，您好，请输入账号和密码登录</div>
         </div>
         <div class="right">
             <svg viewBox="0 0 320 300">
@@ -46,7 +46,7 @@
                 let id = this.id;
                 let password = this.password;
                 reqwest({
-                    url: "SuperUserLoginServlet"
+                    url: "TeacherLoginServlet"
                     , method: 'post'
                     , data: {
                         id: id,
@@ -59,7 +59,7 @@
                         if(data['code']===200) {
                             alert("登录成功");
                             self.data = data;
-                            window.location.href = "superUserIndex.html";
+                            window.location.href = "TeacherIndex.html";
                         } else {
                             alert(data["msg"])
                         }

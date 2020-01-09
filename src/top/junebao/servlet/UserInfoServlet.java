@@ -37,6 +37,7 @@ public class UserInfoServlet extends HttpServlet {
         } else{
             Object play = request.getAttribute("play");
             if("Student".equals(play.toString()) || "Teacher".equals(play.toString()) || "SuperUser".equals(play.toString())){
+                System.out.println(play.toString());
                 User user = (User) request.getAttribute("user");
                 id = user.id;
                 Object objUser = null;
@@ -81,7 +82,7 @@ public class UserInfoServlet extends HttpServlet {
             JsonResponse.jsonResponse(resp, 401, "您还没登录");
         } else {
             Object play = req.getAttribute("play");
-            if("Student".equals(play.toString()) || "Teacher".equals(play.toString())){
+            if("Student".equals(play.toString()) || "Teacher".equals(play.toString()) || "SuperUser".equals(play.toString())){
                 User user = (User) req.getAttribute("user");
                 id = user.id;
                 if(!Power.power(id, play.toString(), resp)){

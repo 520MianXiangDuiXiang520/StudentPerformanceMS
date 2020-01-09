@@ -3,7 +3,6 @@ package top.junebao.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import top.junebao.utils.DruidUtils;
-import top.junebao.utils.JSONUtil;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ public class SCDao {
      * @return 返回查询到的list，没有查询到返回null
      * @throws JsonProcessingException
      */
-    public static List<Map<String, Object>> selectSCBySnoCno(String Sno, String Cno) throws JsonProcessingException {
+    public static List<Map<String, Object>> selectSCBySnoCno(String Sno, String Cno) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
         String sql = "SELECT student.id AS studentId, student.name AS studentName," +
                 " course.id AS courseID, course.name AS courseName ,sc.score " +
@@ -29,6 +28,24 @@ public class SCDao {
         else {
            return rows;
         }
+    }
+
+    /**
+     * 为某个班所有学生添加某门课程
+     * @param className
+     * @param courseId
+     * @return
+     */
+    public static boolean insertAllSCByClassName(String className, String courseId){
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "INSERT INTO sc(sc.sno, sc.cno)" +
+                " SELECT student.id, '" + courseId +"' FROM student WHERE student.studentClass = ?;";
+        int update = jdbcTemplate.update(sql, className);
+        return update >= 1;
+    }
+
+    public static boolean isHaveSCBySnoCno(String sno, String cno) {
+        return selectSCBySnoCno(sno, cno) != null;
     }
 
     /**
@@ -66,6 +83,44 @@ public class SCDao {
     }
 
     /**
+     * 查询某个班所有人选课信息
+     * @param className 班级号
+     * @return
+     */
+    public static List<Map<String, Object>> selectAllSCByClassName(String className) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT student.id AS studentId, student.name AS studentName," +
+                "course.id AS courseId, course.name AS courseName, sc.score, sc.id AS scno " +
+                "FROM student, sc, course " +
+                "WHERE student.studentClass =  ? AND course.id = sc.cno AND student.id = sc.sno ";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, className);
+        if(maps.size() < 1)
+            return null;
+        else
+            return maps;
+    }
+
+    public static Object selectFirstSC(int num) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT student.id AS studentId, student.name AS studentName," +
+                "course.id AS courseId, course.name AS courseName, sc.score, sc.id AS scno " +
+                "FROM student, sc, course " +
+                "WHERE course.id = sc.cno AND student.id = sc.sno LIMIT "+ num +";";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql);
+        if(maps.size() < 1)
+            return null;
+        else
+            return maps;
+    }
+
+    public static boolean insertNewCS(String sno, String cno) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "INSERT INTO sc(sno, cno, scstatus) VALUES(?,?, '选修');";
+        int update = jdbcTemplate.update(sql, sno, cno);
+        return update == 1;
+    }
+
+    /**
      * 修改某位同学的某门课成绩
      * @param sno
      * @param cno
@@ -77,5 +132,41 @@ public class SCDao {
         String sql = "UPDATE sc SET score = ? WHERE sno = ? AND cno = ?";
         int update = jdbcTemplate.update(sql, newScore, sno, cno);
         return update == 1;
+    }
+
+    public static boolean insertSC(String sno, String cno) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "INSERT INTO sc(sno, cno) VALUES(?,?);";
+        int update = jdbcTemplate.update(sql, sno, cno);
+        return update == 1;
+    }
+
+    public static boolean isHaveSC(String sno, String cno) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT * FROM sc WHERE sno = ? AND cno = ?;";
+        return jdbcTemplate.queryForList(sql, sno, cno).size() == 1;
+    }
+
+    public static boolean deleteSCById(int id){
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "DELETE FROM sc WHERE  id= ?";
+        int row = jdbcTemplate.update(sql, id);
+        return row == 1;
+    }
+
+    /**
+     * 查询所有这个学生没选过的课程
+     * @param sno 学号
+     * @return
+     */
+    public static Object selectAllNo(String sno) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT course.id AS courseId, course.`name` AS courseName, course.Cscore," +
+                " course.Ctime, teacher.id AS teacherId, teacher.name AS teacherName" +
+                " FROM course, teacher, tc WHERE course.type = '选修'" +
+                " AND course.id NOT IN (SELECT sc.cno FROM sc WHERE sc.sno=?)" +
+                "  AND course.id = tc.cno AND teacher.id = tc.tno;";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, sno);
+        return maps;
     }
 }

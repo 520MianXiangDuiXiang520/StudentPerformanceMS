@@ -68,7 +68,7 @@ public class StudentDao {
      */
     public static List<Student> selectFirstClassStudents(int num) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "SELECT * FROM student ORDER BY student.student_class LIMIT "+ num +";";
+        String sql = "SELECT * FROM student ORDER BY student.studentClass LIMIT "+ num +";";
         List<Student> maps = jdbcTemplate.query(sql, new BeanPropertyRowMapper<Student>(Student.class));
         return maps;
     }

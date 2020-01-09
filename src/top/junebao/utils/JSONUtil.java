@@ -56,7 +56,14 @@ public class JSONUtil {
         for (String sp:splits
         ) {
             String[] kvs = sp.split("=");
-            map.put(kvs[0], kvs[1]);
+            Object v = null;
+            try{
+                v = kvs[1];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
+
+            map.put(kvs[0], v);
         }
         return map;
     }

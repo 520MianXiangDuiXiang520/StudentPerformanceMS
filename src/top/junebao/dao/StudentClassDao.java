@@ -2,15 +2,22 @@ package top.junebao.dao;
 
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import top.junebao.domain.Student;
 import top.junebao.domain.StudentClass;
 import top.junebao.utils.DruidUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class StudentClassDao {
     private static JdbcTemplate jdbcTemplate = null;
+
+    public static boolean deleteClass(String className) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "DELETE FROM studentClass WHERE  className = ?";
+        int row = jdbcTemplate.update(sql, className);
+        return row == 1;
+    }
 
     public static StudentClass insert(String className, String magor) {
         return null;
@@ -33,7 +40,6 @@ public class StudentClassDao {
 
     /**
      * 根据班级获取该班所有学生
-     * TODO：使用视图加快查询速度
      * @param classId 班级号
      * @return List<Map<String, Object>> 没有查询到返回空list
      */
@@ -59,4 +65,52 @@ public class StudentClassDao {
         }
     }
 
+    /**
+     * 获取所有班级
+     * @return
+     */
+    public static List<Map<String, Object>> getAllClasses() {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "select studentclass.className, magor," +
+                "  COUNT(1) AS num FROM student, studentclass WHERE" +
+                " student.studentClass = studentclass.className GROUP BY student.studentClass;";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql);
+        if(maps.size() < 1)
+            return null;
+        else{
+            return maps;
+        }
+    }
+
+    /**
+     * 查询某学院所有班级
+     * @param schoolId
+     * @return
+     */
+    public static Map<String, Object> getClassesBySchool(String schoolId) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT * FROM studentClass WHERE school = ?";
+        List<Map<String, Object>> maps = jdbcTemplate.queryForList(sql, schoolId);
+        if(maps.size() < 1) {
+            return null;
+        } else {
+            Map<String, Object> result = new HashMap<>();
+            result.put("schoolId", schoolId);
+            result.put("classes", maps);
+            return result;
+        }
+    }
+
+    public static boolean insertNewClass(String className, String magor) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "INSERT INTO studentClass(className, magor) VALUES(?,?);";
+        int update = jdbcTemplate.update(sql, className, magor);
+        return update == 1;
+    }
+
+    public static boolean isHaveClass(String className) {
+        jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
+        String sql = "SELECT * FROM studentClass WHERE className = ?";
+        return jdbcTemplate.queryForList(sql, className).size() == 1;
+    }
 }
