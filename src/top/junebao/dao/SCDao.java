@@ -151,7 +151,7 @@ public class SCDao {
 
     public static boolean insertSC(String sno, String cno) {
         jdbcTemplate = new JdbcTemplate(DruidUtils.getDataSource());
-        String sql = "INSERT INTO sc(sno, cno) VALUES(?,?);";
+        String sql = "INSERT INTO sc(sno, cno, scstatus) VALUES(?,?, '选修');";
         int update = jdbcTemplate.update(sql, sno, cno);
         return update == 1;
     }

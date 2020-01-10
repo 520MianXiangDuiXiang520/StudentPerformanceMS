@@ -59,6 +59,7 @@
                         if(data['code']===200) {
                             alert("登录成功");
                             self.data = data;
+                            // 跳转
                             window.location.href = "StudentIndex.html";
                         } else {
                             alert(data["msg"])

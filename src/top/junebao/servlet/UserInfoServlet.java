@@ -49,6 +49,7 @@ public class UserInfoServlet extends HttpServlet {
                         Class<?> aClass = Class.forName("top.junebao.dao."+play.toString() + "Dao");
                         Method method = aClass.getMethod("get" + play.toString() + "InfoById", String.class);
                         objUser = method.invoke(aClass.newInstance(), id);
+
                     } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
@@ -73,7 +74,7 @@ public class UserInfoServlet extends HttpServlet {
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 修改学生信息
+        // 修改信息
         SetType.set(req, resp);
         String fromDataString = JSONUtil.toFormDataString(req);
         Map<String, Object> map = JSONUtil.fromDataToMap(fromDataString);
@@ -107,7 +108,7 @@ public class UserInfoServlet extends HttpServlet {
                                 if (!CheckParametersUtil.checkFieldIsInClass(playClass, key)){
                                     JsonResponse.jsonResponse(resp, 400, "参数错误！");
                                 } else {
-                                    // 4. 确保newValue字段合法（反射！！）
+                                    // 4. 确保newValue字段合法
                                     if(!CheckParametersUtil.checkValueByKey(key, newValue)) {
                                         JsonResponse.jsonResponse(resp, 400, "新值不合法！");
                                     } else {
